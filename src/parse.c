@@ -1,30 +1,67 @@
 #include "parse.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-int FileLength(FILE * fpointer){
-    unsigned int length;
-    fseek(fpointer, 0L, SEEK_END);
-    length = ftell(fpointer);
+unsigned int NumCards(FILE * fpointer){
+    unsigned int numCards = 0;
+    char * p;
+
+    char tempString[5];
+    while(fgets(tempString, 5, fpointer))
+    {
+        if((p = strchr(tempString, '\n')) != NULL)
+            *p ='\0';
+
+        if(strcmp(tempString, "----") == 0)
+            numCards++;
+    }
     rewind(fpointer);
 
-    return length;
+    return numCards;
+}
+
+void MakeCard(FILE * fp, struct Card * card)
+{
+    char tmp[100];
+    char * ans = malloc(sizeof(char) * 1000);
+    char * question = malloc(sizeof(char) * 1000);
+    char * p;
+
+    fgets(tmp, 100, fp);
+
+    fgets(ans, 1000, fp);
+    card->answer = ans;
+    if((p = strchr(ans, '\n')) != NULL)
+        *p ='\0';
+
+    fgets(tmp, 100, fp);
+
+    fgets(question, 1000, fp);
+    card->question = question;
+    if((p = strchr(question, '\n')) != NULL)
+        *p ='\0';
 }
 
 
-char * FileToString(char * path) {
-
-    path = AppendExecLocation(path);
-
+struct Card * MakeDeck(char * path)
+{
     FILE * fpointer = fopen(path, "r");
-    int fileLength = FileLength(fpointer);
-    char * outString = malloc(fileLength * sizeof(char) + 1);
-    strcpy(outString, "\0");
-    char tempString[150];
+    unsigned int numCards = NumCards(fpointer);
+    struct Card * deck = malloc(numCards * sizeof(struct Card));
+    char tmp[5];
+    char * p;
+    int i = 0;
 
-    printf("%s\n", outString);
-
-    while(fgets(tempString, 150, fpointer)){
-        strcat(outString, tempString);
+    while(fgets(tmp, 5, fpointer)){
+        if((p = strchr(tmp, '\n')) != NULL)
+            *p ='\0';
+        if(strcmp(tmp, "----") == 0)
+        {
+            MakeCard(fpointer, &deck[i]);
+            i++;
+        }
     }
 
-    return outString;
+    return deck;
 }

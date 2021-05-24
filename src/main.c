@@ -2,10 +2,11 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include "parse.h"
 
 void wprintwrap(WINDOW * window, int width, char * str)
 {
-  int y,x;
+  int y, x;
   getyx(window, y, x);
   for(int i = 0; i < strlen(str); i++)
   {
@@ -59,16 +60,24 @@ int main()
   char tmp[2];
   tmp[1] = '\0';
   int ch = 0;
+  int i = 0;
+  struct Card * deck = MakeDeck("/home/liam/dev/deck/res/d.deck");
+  wmove(question,1,1);
+  wprintw(question, deck[0].question);
+  wrefresh(question);
+
   while(ch != 27){
     ch = getch();
     switch (ch)
     {
       case 10:
-        if(!strcmp(str, "sup"))
+        if(!strcmp(str, deck[i].answer))
         {
+          i++;
           wmove(answer, 1, 1);
           wfillwrap(answer, windowWidth, windowWidth * windowHeight);
           str[0] = '\0';
+
           wmove(answer, 1, 1);
           wprintw(answer, "");
           wrefresh(answer);
@@ -76,7 +85,7 @@ int main()
           wmove(question, 1, 1);
           wfillwrap(question, windowWidth, windowWidth * windowHeight);
           wmove(question, 1, 1);
-          wprintw(question, "sup");
+          wprintw(question, deck[i].question);
           wrefresh(question);
         }
         break;

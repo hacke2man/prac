@@ -5,8 +5,12 @@
 extern "C" {
 #endif
 
-  char * FileToString(char * path);
-  char * AppendExecLocation(char * pathExtension);
+  struct Card {
+    char * question;
+    char * answer;
+  };
+
+  struct Card * MakeDeck(char * path);
 
 #ifdef __cplusplus
 }
