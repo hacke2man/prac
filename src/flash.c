@@ -1,38 +1,10 @@
 #include <ncurses.h>
-#include <math.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "parse.h"
-
-void wprintwrap(WINDOW * window, int width, char * str)
-{
-  int y, x;
-  getyx(window, y, x);
-  for(int i = 0; i < strlen(str); i++)
-  {
-    if(i%width == 0 && i > 0)
-    {
-      wmove(window, y + i/width, 1);
-    }
-
-    waddch(window, str[i]);
-  }
-}
-
-void wfillwrap(WINDOW * window, int width, int num)
-{
-  int y, x;
-  getyx(window, y, x);
-  for(int i = 0; i < num; i++)
-  {
-    if(i%width == 0 && i > 0)
-    {
-      wmove(window, y + i/width, 1);
-    }
-
-    waddch(window, ' ');
-  }
-}
+#include "util.h"
+#include "flash.h"
 
 int main()
 {
@@ -40,7 +12,6 @@ int main()
   raw();
   noecho();
   refresh();
-
   WINDOW * question = newwin(3*LINES/8, COLS/3, LINES/8, COLS/3);
   box(question, 0, 0);
   wrefresh(question);
@@ -61,10 +32,14 @@ int main()
   tmp[1] = '\0';
   int ch = 0;
   int i = 0;
-  struct Card * deck = MakeDeck("/home/liam/dev/deck/res/d.deck");
+  struct Card * deck = MakeDeck("/home/liam/dev/prac/res/d.deck");
   wmove(question,1,1);
   wprintw(question, deck[0].question);
   wrefresh(question);
+
+  wmove(answer, 1, 0);
+  wprintw(answer, "|");
+  wrefresh(answer);
 
   while(ch != 27){
     ch = getch();
@@ -78,15 +53,15 @@ int main()
           wfillwrap(answer, windowWidth, windowWidth * windowHeight);
           str[0] = '\0';
 
-          wmove(answer, 1, 1);
-          wprintw(answer, "");
-          wrefresh(answer);
-
           wmove(question, 1, 1);
           wfillwrap(question, windowWidth, windowWidth * windowHeight);
           wmove(question, 1, 1);
           wprintw(question, deck[i].question);
           wrefresh(question);
+
+          wmove(answer, 1, 0);
+          wprintw(answer, "|");
+          wrefresh(answer);
         }
         break;
       case 127:
@@ -107,5 +82,8 @@ int main()
         break;
     }
   }
+
+  delwin(answer);
+  delwin(question);
   endwin();
 }
